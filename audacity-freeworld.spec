@@ -198,7 +198,7 @@ fi
 
 %posttrans
 /usr/bin/gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-/usr/bin/update-mime-database %{_datadir}/mime &> /dev/null || :
+/usr/bin/update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 
 %files -f %{realname}.lang
