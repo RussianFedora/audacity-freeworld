@@ -3,31 +3,29 @@
 #%#global commit dea351aa4820efd7ce8c2254930f942a6590472b
 #%#global shortcommit %(c=%#{commit}; echo ${c:0:7})
 
-Name: audacity-freeworld
+Name:       audacity-freeworld
+Version:    2.1.2
+Release:    2%{?dist}
+Summary:    Multitrack audio editor
+Group:      Applications/Multimedia
+License:    GPLv2
+URL:        http://audacity.sourceforge.net
 
-Version: 2.1.2
-Release: 1%{?dist}
-Summary: Multitrack audio editor
-Group:   Applications/Multimedia
-License: GPLv2
-URL:     http://audacity.sourceforge.net
+%global     realname audacity
+Conflicts:  %{realname}
 
-%define realname audacity
-Conflicts: %{realname}
-
-Source0: http://www.fosshub.com/Audacity/download/%{realname}-minsrc-%{version}.tar.xz
+Source0:    http://www.fosshub.com/Audacity/download/%{realname}-minsrc-%{version}.tar.xz
 # For alpha git snapshots for testing use the github archive as upstream source:
 #Source0: https://github.com/audacity/%#{name}/archive/%#{commit}/%#{name}-%#{commit}.tar.gz
 # ie https://github.com/audacity/audacity/archive/dea351aa4820efd7ce8c2254930f942a6590472b/audacity-dea351aa4820efd7ce8c2254930f942a6590472b.tar.xz
 #Source0: http://downloads.sf.net/sourceforge/audacity/audacity-minsrc-%#{version}.tar.xz
-%define tartopdir audacity-minsrc-%{version}
+%global     tartopdir audacity-minsrc-%{version}
 #define tartopdir audacity-%#{commit}
-Source1:    ImportFLAC.cpp
 
 # manual can be installed from the base Fedora audacity package.
 #S#ource1: http://www.fosshub.com/Audacity.html/%{realname}-manual-%{version}.zip
 
-Patch1: audacity-60f2322055756e8cacfe96530a12c63e9694482c.patch
+Patch1:     audacity-60f2322055756e8cacfe96530a12c63e9694482c.patch
 # Patch1: audacity-2.0.4-libmp3lame-default.patch
 # Patch2: audacity-1.3.9-libdir.patch
 # add audio/x-flac
@@ -35,41 +33,44 @@ Patch1: audacity-60f2322055756e8cacfe96530a12c63e9694482c.patch
 # enable startup notification
 # add categories Sequencer X-Jack AudioVideoEditing for F-12 Studio feature
 # Patch3: audacity-2.0.2-desktop.in.patch
-Patch4: audacity-2.0.6-non-dl-ffmpeg.patch
+Patch4:     audacity-2.0.6-non-dl-ffmpeg.patch
 # BZ#1076795:
 # Patch5: audacity-2.0.4-equalization-segfault.patch# BZ#1076795
 
-Provides: audacity-nonfree = %{version}-%{release}
-Obsoletes: audacity-nonfree < %{version}-%{release}
+Provides:       audacity-nonfree = %{version}-%{release}
+Obsoletes:      audacity-nonfree < %{version}-%{release}
 
-BuildRequires: alsa-lib-devel
-BuildRequires: desktop-file-utils
-BuildRequires: expat-devel
-BuildRequires: flac-devel
-BuildRequires: gettext
-BuildRequires: jack-audio-connection-kit-devel
-BuildRequires: ladspa-devel
-BuildRequires: libid3tag-devel
-BuildRequires: taglib-devel
-BuildRequires: libogg-devel
-BuildRequires: libsndfile-devel
-BuildRequires: libvorbis-devel
-BuildRequires: portaudio-devel >= 19-16
-BuildRequires: soundtouch-devel
-BuildRequires: soxr-devel
-BuildRequires: vamp-plugin-sdk-devel >= 2.0
-BuildRequires: zip
-BuildRequires: zlib-devel
-BuildRequires: wxGTK3-devel
+BuildRequires:  pkgconfig(alsa)
+BuildRequires:  desktop-file-utils
+BuildRequires:  pkgconfig(expat)
+BuildRequires:  pkgconfig(flac)
+BuildRequires:  gettext
+BuildRequires:  pkgconfig(jack)
+BuildRequires:  ladspa-devel
+BuildRequires:  pkgconfig(id3tag)
+BuildRequires:  pkgconfig(taglib)
+BuildRequires:  pkgconfig(ogg)
+BuildRequires:  pkgconfig(sndfile)
+BuildRequires:  pkgconfig(vorbis)
+BuildRequires:  pkgconfig(portaudio-2.0) >= 19
+BuildRequires:  pkgconfig(soundtouch)
+BuildRequires:  pkgconfig(soxr)
+BuildRequires:  pkgconfig(vamp-sdk) >= 2.0
+BuildRequires:  zip
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  wxGTK3-devel
 %if 0%{?rhel} >= 8 || 0%{?fedora} 
 BuildRequires: libappstream-glib
 %endif
-%{?_with_mp3:BuildRequires: libmad-devel twolame-devel}
+%{?_with_mp3:BuildRequires: pkgconfig(mad) pkgconfig(twolame)}
 #B#uildRequires: ffmpeg-compat-devel
-BuildRequires: ffmpeg-devel
-BuildRequires: lame-devel
+BuildRequires:  pkgconfig(libavcodec)
+BuildRequires:  lame-devel
+BuildRequires:  libappstream-glib
+
 # For new symbols in portaudio
-Requires:      portaudio%{?_isa} >= 19-16
+Requires:       portaudio%{?_isa} >= 19-16
+Requires:       hicolor-icon-theme
 
 %description
 Audacity is a cross-platform multitrack audio editor. It allows you to
@@ -83,6 +84,7 @@ This build has support for mp3 and ffmpeg import/export.
 %prep
 %setup -q -n %{tartopdir}
 
+#Compile with GCC 6
 %patch1 -p1 -b .gcc6
 # Substitute hardcoded library paths.
 #patch1 -b .libmp3lame-default
@@ -147,7 +149,7 @@ make
 
 %install
 %make_install
-rm -Rf $RPM_BUILD_ROOT%{_datadir}/%{realname}/include
+rm -Rf %{buildroot}%{_datadir}/%{realname}/include
 
 %if 0%{?rhel} >= 8 || 0%{?fedora} 
 if appstream-util --help | grep -q replace-screenshots ; then
@@ -157,23 +159,25 @@ if appstream-util --help | grep -q replace-screenshots ; then
 #
 # See http://people.freedesktop.org/~hughsient/appdata/#screenshots for more details.
 #
-appstream-util replace-screenshots $RPM_BUILD_ROOT%{_datadir}/appdata/audacity.appdata.xml \
+appstream-util replace-screenshots %{buildroot}%{_datadir}/appdata/audacity.appdata.xml \
   https://raw.githubusercontent.com/hughsie/fedora-appstream/master/screenshots-extra/audacity/a.png 
 fi
 %endif
 
 # Audacity 1.3.8-beta complains if the help/manual directories
 # don't exist.
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/help/manual
+mkdir -p %{buildroot}%{_datadir}/%{name}/help/manual
 
 %{find_lang} %{realname}
 
-desktop-file-install --dir $RPM_BUILD_ROOT%{_datadir}/applications \
+desktop-file-install --dir %{buildroot}%{_datadir}/applications \
 %if 0%{?fedora} && 0%{?fedora} < 19
         --vendor fedora --delete-original                          \
 %endif
-        $RPM_BUILD_ROOT%{_datadir}/applications/audacity.desktop
+        %{buildroot}%{_datadir}/applications/audacity.desktop
 
+%check
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/*.appdata.xml
 
 %post
 ##umask 022
@@ -200,10 +204,7 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 
 %files -f %{realname}.lang
 %{_bindir}/%{realname}
-%dir %{_datadir}/%{realname}
-%{_datadir}/%{realname}/EQDefaultCurves.xml
-%{_datadir}/%{realname}/nyquist/
-%{_datadir}/%{realname}/plug-ins/
+%{_datadir}/%{realname}
 %{_mandir}/man*/*
 %{_datadir}/applications/*
 %{_datadir}/appdata/%{realname}.appdata.xml
@@ -211,10 +212,15 @@ update-mime-database %{?fedora:-n} %{_datadir}/mime &> /dev/null || :
 %{_datadir}/icons/hicolor/*/apps/%{realname}.*
 %{_datadir}/mime/packages/*
 %doc %{_datadir}/doc/*
-%doc lib-src/libnyquist/nyquist/license.txt lib-src/libnyquist/nyquist/Readme.txt
+%doc lib-src/libnyquist/nyquist/Readme.txt
+%license lib-src/libnyquist/nyquist/license.txt
 
 
 %changelog
+* Wed Jun 22 2016 Vasiliy N. Glazov <vascom2@gmail.com> - 2.1.2-2
+- Clean spec
+- Add path to build with GCC 6
+
 * Thu Mar 03 2016 Sérgio Basto <sergio@serjux.com> - 2.1.2-1
 - Update audacity to 2.1.2 final
 
