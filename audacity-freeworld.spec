@@ -14,12 +14,12 @@ URL:        http://audacity.sourceforge.net
 %global     realname audacity
 Conflicts:  %{realname}
 
-Source0:    http://www.fosshub.com/Audacity.html/download/%{realname}-minsrc-%{version}.tar.xz
+Source0:    https://github.com/audacity/audacity/archive/Audacity-%{version}.tar.gz
 # For alpha git snapshots for testing use the github archive as upstream source:
 #Source0: https://github.com/audacity/%#{name}/archive/%#{commit}/%#{name}-%#{commit}.tar.gz
 # ie https://github.com/audacity/audacity/archive/dea351aa4820efd7ce8c2254930f942a6590472b/audacity-dea351aa4820efd7ce8c2254930f942a6590472b.tar.xz
 #Source0: http://downloads.sf.net/sourceforge/audacity/audacity-minsrc-%#{version}.tar.xz
-%global     tartopdir audacity-minsrc-%{version}
+%global     tartopdir audacity-Audacity-%{version}
 #define tartopdir audacity-%#{commit}
 
 # manual can be installed from the base Fedora audacity package.
